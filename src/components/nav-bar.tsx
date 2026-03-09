@@ -1,25 +1,105 @@
 import { Filter, Search } from "lucide-react"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group"
 import { Button } from "./ui/button"
+import { Badge } from "./ui/badge"
 import { useThread } from "@/hooks/use-thread"
 import { useNavigate, useSearch } from "@tanstack/react-router"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetFooter,
+} from "./ui/sheet"
 
 export function NavBar() {
   const navigate = useNavigate()
-  const { search } = useSearch({
-    from: "/",
-  })
+  const { search, categories } = useSearch({ from: "/" })
 
-  const threads = useThread(search)
+  const { data: allThreads } = useThread()
+  const { data: filteredThreads } = useThread(search, categories)
+
+  const uniqueCategories = [
+    ...new Set((allThreads ?? []).map((t) => t.category).filter(Boolean)),
+  ].sort()
+
+  const selectedCategories = categories ?? []
+  const hasActiveFilter = selectedCategories.length > 0
+
+  function toggleCategory(cat: string) {
+    const next = selectedCategories.includes(cat)
+      ? selectedCategories.filter((c) => c !== cat)
+      : [...selectedCategories, cat]
+    navigate({
+      to: "/",
+      search: (prev) => ({ ...prev, categories: next.length ? next : undefined }),
+    })
+  }
+
+  function clearCategories() {
+    navigate({
+      to: "/",
+      search: (prev) => ({ ...prev, categories: undefined }),
+    })
+  }
 
   return (
-    <nav className="flex items-center justify-between bg-primary p-4 text-primary-foreground">
-      {/* Filter */}
-      <Button size="icon" aria-label="Submit">
-        <Filter className="text-primary-foreground" />
-      </Button>
+    <nav className="flex items-center justify-between gap-2 bg-primary p-4 text-primary-foreground">
+      {/* Filter sheet */}
+      <Sheet>
+        <SheetTrigger
+          render={
+            <Button
+              size="icon"
+              aria-label="Filter kategori"
+              variant="ghost"
+              className="relative shrink-0 text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            />
+          }
+        >
+          <Filter />
+          {hasActiveFilter && (
+            <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-destructive text-[10px] text-white">
+              {selectedCategories.length}
+            </span>
+          )}
+        </SheetTrigger>
+
+        <SheetContent side="bottom" className="max-h-[60vh]">
+          <SheetHeader>
+            <SheetTitle>Filter Kategori</SheetTitle>
+          </SheetHeader>
+
+          <div className="flex flex-wrap gap-2 px-4 py-2">
+            {uniqueCategories.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Tidak ada kategori.</p>
+            ) : (
+              uniqueCategories.map((cat) => (
+                <Badge
+                  key={cat}
+                  variant={selectedCategories.includes(cat) ? "default" : "outline"}
+                  className="cursor-pointer select-none text-sm"
+                  onClick={() => toggleCategory(cat)}
+                >
+                  #{cat}
+                </Badge>
+              ))
+            )}
+          </div>
+
+          {hasActiveFilter && (
+            <SheetFooter>
+              <Button variant="outline" size="sm" onClick={clearCategories}>
+                Hapus Filter
+              </Button>
+            </SheetFooter>
+          )}
+        </SheetContent>
+      </Sheet>
+
       {/* Search bar */}
-      <InputGroup className="max-w-xs">
+      <InputGroup className="w-full min-w-0 max-w-xs sm:max-w-sm">
         <InputGroupInput
           placeholder="Search..."
           value={search}
@@ -36,11 +116,12 @@ export function NavBar() {
         <InputGroupAddon>
           <Search />
         </InputGroupAddon>
-        <InputGroupAddon align="inline-end">
-          {threads.data?.length} Threads
+        <InputGroupAddon align="inline-end" className="hidden sm:flex">
+          {filteredThreads?.length} Threads
         </InputGroupAddon>
       </InputGroup>
-      <h1 className="text-xl font-bold">Forums App</h1>
+
+      <h1 className="hidden shrink-0 text-xl font-bold sm:block">Forums App</h1>
     </nav>
   )
 }

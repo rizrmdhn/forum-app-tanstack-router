@@ -5,17 +5,12 @@ import { Link } from "@tanstack/react-router"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
 import { Skeleton } from "./ui/skeleton"
 
 interface ThreadCardProps {
   thread: IThread
+  enableVote?: boolean
   ownerName?: string
   ownerAvatar?: string
   onUpVote?: (threadId: string) => void
@@ -54,6 +49,7 @@ export function ThreadCardSkeleton() {
 
 export function ThreadCard({
   thread,
+  enableVote = true,
   ownerName,
   ownerAvatar,
   onUpVote,
@@ -69,6 +65,7 @@ export function ThreadCard({
     : false
 
   function handleUpVote() {
+    if (!enableVote) return
     if (hasUpVoted) {
       onNeutralVote?.(thread.id)
     } else {
@@ -77,6 +74,7 @@ export function ThreadCard({
   }
 
   function handleDownVote() {
+    if (!enableVote) return
     if (hasDownVoted) {
       onNeutralVote?.(thread.id)
     } else {
@@ -128,6 +126,7 @@ export function ThreadCard({
         <Button
           variant={hasUpVoted ? "default" : "outline"}
           size="sm"
+          disabled={!enableVote}
           onClick={handleUpVote}
         >
           <ThumbsUp />
@@ -136,6 +135,7 @@ export function ThreadCard({
         <Button
           variant={hasDownVoted ? "destructive" : "outline"}
           size="sm"
+          disabled={!enableVote}
           onClick={handleDownVote}
         >
           <ThumbsDown />

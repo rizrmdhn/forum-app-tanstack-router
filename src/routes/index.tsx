@@ -21,15 +21,18 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 export const Route = createFileRoute("/")({
   validateSearch: z.object({
     search: z.string().optional(),
-    category: z.string().optional(),
+    categories: z.array(z.string()).optional(),
   }),
   component: HomeComponent,
 })
 
 function HomeComponent() {
-  const { search } = Route.useSearch()
+  const { search, categories } = Route.useSearch()
   const auth = useAppSelector((state) => state.auth)
-  const { data: threads, isLoading: isThreadsLoading } = useThread(search)
+  const { data: threads, isLoading: isThreadsLoading } = useThread(
+    search,
+    categories
+  )
   const { data: users, isLoading: isUsersLoading } = useUsers()
   const { mutate: voteThread } = useVoteThreadList()
 
@@ -41,40 +44,47 @@ function HomeComponent() {
       <NavBar />
       <ScrollArea className="min-h-0">
         <div className="mx-auto max-w-2xl space-y-4 p-4">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => (
-              <ThreadCardSkeleton key={i} />
-            ))
-          : threads?.map((thread) => {
-              const owner = users?.find((u) => u.id === thread.ownerId)
-              return (
-                <ThreadCard
-                  key={thread.id}
-                  thread={thread}
-                  currentUserId={auth?.id}
-                  ownerName={owner?.name}
-                  ownerAvatar={owner?.avatar}
-                  onUpVote={(id) => voteThread({ threadId: id, voteType: "up" })}
-                  onDownVote={(id) => voteThread({ threadId: id, voteType: "down" })}
-                  onNeutralVote={(id) => voteThread({ threadId: id, voteType: "neutral" })}
-                />
-              )
-            })}
-        {isEmpty && (
-          <Empty className="mt-12">
-            <EmptyHeader>
-              <EmptyMedia variant="icon">
-                <LayoutList />
-              </EmptyMedia>
-              <EmptyTitle>Tidak ada thread</EmptyTitle>
-              <EmptyDescription>
-                {search
-                  ? `Tidak ada thread yang cocok dengan "${search}".`
-                  : "Belum ada thread yang dibuat."}
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        )}
+          {isLoading
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <ThreadCardSkeleton key={i} />
+              ))
+            : threads?.map((thread) => {
+                const owner = users?.find((u) => u.id === thread.ownerId)
+                return (
+                  <ThreadCard
+                    key={thread.id}
+                    thread={thread}
+                    enableVote={!!auth}
+                    currentUserId={auth?.id}
+                    ownerName={owner?.name}
+                    ownerAvatar={owner?.avatar}
+                    onUpVote={(id) =>
+                      voteThread({ threadId: id, voteType: "up" })
+                    }
+                    onDownVote={(id) =>
+                      voteThread({ threadId: id, voteType: "down" })
+                    }
+                    onNeutralVote={(id) =>
+                      voteThread({ threadId: id, voteType: "neutral" })
+                    }
+                  />
+                )
+              })}
+          {isEmpty && (
+            <Empty className="mt-12">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <LayoutList />
+                </EmptyMedia>
+                <EmptyTitle>Tidak ada thread</EmptyTitle>
+                <EmptyDescription>
+                  {search
+                    ? `Tidak ada thread yang cocok dengan "${search}".`
+                    : "Belum ada thread yang dibuat."}
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
         </div>
       </ScrollArea>
       {auth && <CreateThreadDialog />}
