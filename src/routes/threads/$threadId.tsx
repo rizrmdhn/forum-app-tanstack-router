@@ -1,14 +1,19 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { useThreadDetail } from "@/hooks/use-thread-detail"
+import { useCreateComment } from "@/hooks/use-create-comment"
+import { useVoteComment } from "@/hooks/use-vote-comment"
+import { useVoteThread } from "@/hooks/use-vote-thread"
 import { useAppSelector } from "@/hooks/use-store"
+import { useForm } from "react-hook-form"
 import { formatDistanceToNow } from "date-fns"
-import { ChevronLeft, MessageSquare, ThumbsDown, ThumbsUp } from "lucide-react"
+import { ChevronLeft, MessageSquare, Send, ThumbsDown, ThumbsUp } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Textarea } from "@/components/ui/textarea"
 
 export const Route = createFileRoute("/threads/$threadId")({
   component: ThreadDetailComponent,
@@ -19,6 +24,20 @@ function ThreadDetailComponent() {
   const router = useRouter()
   const auth = useAppSelector((state) => state.auth)
   const { data: thread, isLoading } = useThreadDetail(threadId)
+  const { mutate: createComment, isPending: isSubmitting } = useCreateComment(threadId)
+  const { mutate: voteComment } = useVoteComment(threadId)
+  const { mutate: voteThread } = useVoteThread(threadId)
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<{ content: string }>()
+
+  const onSubmitComment = ({ content }: { content: string }) => {
+    createComment(content, { onSuccess: () => reset() })
+  }
 
   const hasUpVoted = auth?.id
     ? (thread?.upVotesBy ?? []).includes(auth.id)
@@ -86,6 +105,8 @@ function ThreadDetailComponent() {
                   <Button
                     variant={hasUpVoted ? "default" : "outline"}
                     size="sm"
+                    disabled={!auth}
+                    onClick={() => voteThread(hasUpVoted ? "neutral" : "up")}
                   >
                     <ThumbsUp />
                     {thread.upVotesBy.length}
@@ -93,6 +114,8 @@ function ThreadDetailComponent() {
                   <Button
                     variant={hasDownVoted ? "destructive" : "outline"}
                     size="sm"
+                    disabled={!auth}
+                    onClick={() => voteThread(hasDownVoted ? "neutral" : "down")}
                   >
                     <ThumbsDown />
                     {thread.downVotesBy.length}
@@ -105,6 +128,24 @@ function ThreadDetailComponent() {
               </div>
 
               <Separator />
+
+              {/* Comment form */}
+              {auth && (
+                <form onSubmit={handleSubmit(onSubmitComment)} className="space-y-2">
+                  <Textarea
+                    placeholder="Tulis komentar..."
+                    rows={3}
+                    {...register("content", { required: true })}
+                    className={errors.content ? "border-destructive" : ""}
+                  />
+                  <div className="flex justify-end">
+                    <Button type="submit" size="sm" disabled={isSubmitting}>
+                      <Send />
+                      {isSubmitting ? "Mengirim..." : "Kirim"}
+                    </Button>
+                  </div>
+                </form>
+              )}
 
               {/* Comments */}
               <div className="space-y-4">
@@ -155,6 +196,13 @@ function ThreadDetailComponent() {
                           <Button
                             variant={commentUpVoted ? "default" : "ghost"}
                             size="xs"
+                            disabled={!auth}
+                            onClick={() =>
+                              voteComment({
+                                commentId: comment.id,
+                                voteType: commentUpVoted ? "neutral" : "up",
+                              })
+                            }
                           >
                             <ThumbsUp />
                             {comment.upVotesBy.length}
@@ -162,6 +210,13 @@ function ThreadDetailComponent() {
                           <Button
                             variant={commentDownVoted ? "destructive" : "ghost"}
                             size="xs"
+                            disabled={!auth}
+                            onClick={() =>
+                              voteComment({
+                                commentId: comment.id,
+                                voteType: commentDownVoted ? "neutral" : "down",
+                              })
+                            }
                           >
                             <ThumbsDown />
                             {comment.downVotesBy.length}

@@ -1,16 +1,20 @@
+import { useAppSelector } from "@/hooks/use-store"
+import { useLogout } from "@/hooks/use-logout"
 import { Link } from "@tanstack/react-router"
-import { LayoutList, LogIn, Trophy } from "lucide-react"
+import { LayoutList, LogIn, LogOut, Trophy } from "lucide-react"
 
-const items = [
+const navItems = [
   { to: "/leaderboards", label: "Leaderboard", icon: Trophy },
   { to: "/", label: "Threads", icon: LayoutList },
-  { to: "/login", label: "Login", icon: LogIn },
 ] as const
 
 export function BottomNavBar() {
+  const auth = useAppSelector((state) => state.auth)
+  const { mutate: logout } = useLogout()
+
   return (
     <nav className="flex h-14 items-center justify-around border-t bg-background px-4">
-      {items.map(({ to, label, icon: Icon }) => (
+      {navItems.map(({ to, label, icon: Icon }) => (
         <Link
           key={to}
           to={to}
@@ -20,6 +24,23 @@ export function BottomNavBar() {
           {label}
         </Link>
       ))}
+      {auth ? (
+        <button
+          onClick={() => logout()}
+          className="flex flex-col items-center gap-0.5 text-xs text-muted-foreground"
+        >
+          <LogOut className="size-5" />
+          Logout
+        </button>
+      ) : (
+        <Link
+          to="/login"
+          className="flex flex-col items-center gap-0.5 text-xs text-muted-foreground [&.active]:text-primary"
+        >
+          <LogIn className="size-5" />
+          Login
+        </Link>
+      )}
     </nav>
   )
 }

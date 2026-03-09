@@ -1,5 +1,7 @@
 import { ThreadCard, ThreadCardSkeleton } from "@/components/thread-card"
+import { CreateThreadDialog } from "@/components/create-thread-dialog"
 import { useAppSelector } from "../hooks/use-store"
+import { useVoteThreadList } from "@/hooks/use-vote-thread-list"
 import { createFileRoute } from "@tanstack/react-router"
 import z from "zod"
 import { useThread } from "@/hooks/use-thread"
@@ -29,6 +31,7 @@ function HomeComponent() {
   const auth = useAppSelector((state) => state.auth)
   const { data: threads, isLoading: isThreadsLoading } = useThread(search)
   const { data: users, isLoading: isUsersLoading } = useUsers()
+  const { mutate: voteThread } = useVoteThreadList()
 
   const isLoading = isThreadsLoading || isUsersLoading
   const isEmpty = !isLoading && threads?.length === 0
@@ -51,6 +54,9 @@ function HomeComponent() {
                   currentUserId={auth?.id}
                   ownerName={owner?.name}
                   ownerAvatar={owner?.avatar}
+                  onUpVote={(id) => voteThread({ threadId: id, voteType: "up" })}
+                  onDownVote={(id) => voteThread({ threadId: id, voteType: "down" })}
+                  onNeutralVote={(id) => voteThread({ threadId: id, voteType: "neutral" })}
                 />
               )
             })}
@@ -71,6 +77,7 @@ function HomeComponent() {
         )}
         </div>
       </ScrollArea>
+      {auth && <CreateThreadDialog />}
       <BottomNavBar />
     </div>
   )

@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
@@ -15,6 +16,8 @@ import { z } from "zod"
 import "../index.css"
 import { pageHead } from "@/lib/page-head"
 import ReduxProvider from "@/components/redux-provider"
+import { useAppDispatch } from "@/hooks/use-store"
+import { asyncSetIsPreload } from "@/states/is-preload/action"
 
 export interface RouterAppContext {
   queryClient: QueryClient
@@ -38,6 +41,16 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
 })
 
+function AuthInitializer() {
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    dispatch(asyncSetIsPreload())
+  }, [dispatch])
+
+  return null
+}
+
 function RootComponent() {
   return (
     <>
@@ -50,6 +63,7 @@ function RootComponent() {
       >
         <div className="grid h-svh grid-rows-[auto_1fr]">
           <ReduxProvider>
+            <AuthInitializer />
             <Outlet />
           </ReduxProvider>
         </div>
