@@ -1,16 +1,16 @@
-import { useAppSelector } from "@/hooks/use-store"
-import { useLogout } from "@/hooks/use-logout"
-import { Link } from "@tanstack/react-router"
-import { LayoutList, LogIn, LogOut, Trophy } from "lucide-react"
+import { useAppSelector } from '@/hooks/use-store';
+import { useLogout } from '@/hooks/use-logout';
+import { Link } from '@tanstack/react-router';
+import { LayoutList, LogIn, LogOut, Trophy } from 'lucide-react';
 
 const navItems = [
-  { to: "/leaderboards", label: "Leaderboard", icon: Trophy },
-  { to: "/", label: "Threads", icon: LayoutList },
-] as const
+  { to: '/leaderboards', label: 'Leaderboard', icon: Trophy },
+  { to: '/', label: 'Threads', icon: LayoutList },
+] as const;
 
 export function BottomNavBar() {
-  const auth = useAppSelector((state) => state.auth)
-  const { mutate: logout } = useLogout()
+  const auth = useAppSelector((state) => state.auth);
+  const { mutate: logout } = useLogout();
 
   return (
     <nav className="flex h-14 items-center justify-around border-t bg-background px-4">
@@ -26,6 +26,7 @@ export function BottomNavBar() {
       ))}
       {auth ? (
         <button
+          type="button"
           onClick={() => logout()}
           className="flex flex-col items-center gap-0.5 text-xs text-muted-foreground"
         >
@@ -42,5 +43,5 @@ export function BottomNavBar() {
         </Link>
       )}
     </nav>
-  )
+  );
 }

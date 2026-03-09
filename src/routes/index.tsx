@@ -1,6 +1,5 @@
 import { ThreadCard, ThreadCardSkeleton } from "@/components/thread-card"
 import { CreateThreadDialog } from "@/components/create-thread-dialog"
-import { useAppSelector } from "../hooks/use-store"
 import { useVoteThreadList } from "@/hooks/use-vote-thread-list"
 import { createFileRoute } from "@tanstack/react-router"
 import z from "zod"
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/empty"
 import { LayoutList } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useAppSelector } from "../hooks/use-store"
 
 export const Route = createFileRoute("/")({
   validateSearch: z.object({

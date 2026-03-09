@@ -1,9 +1,9 @@
 import { useRouter } from "@tanstack/react-router"
-import { useAppDispatch } from "./use-store"
 import { useMutation } from "@tanstack/react-query"
 import api from "@/lib/api"
 import { receiveAuthUserActionCreator } from "@/states/auth/action"
 import { globalErrorToast, globalSuccessToast } from "@/lib/toast"
+import { useAppDispatch } from "./use-store"
 
 export function useLogin() {
   const dispatch = useAppDispatch()

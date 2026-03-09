@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
-import { useAppDispatch } from "./use-store"
 import api from "@/lib/api"
 import { unsetAuthUserActionCreator } from "@/states/auth/action"
+import { useAppDispatch } from "./use-store"
 
 export function useLogout() {
   const dispatch = useAppDispatch()

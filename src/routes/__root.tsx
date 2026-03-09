@@ -123,7 +123,7 @@ function ErrorComponent({ error }: { error: Error }) {
           if (nextLine?.startsWith("→ at")) {
             const path = nextLine.replace("→ at ", "")
             errors.push(`${path}: ${message}`)
-            i++ // Skip the next line since we've already processed it
+            i += 1 // Skip the next line since we've already processed it
           } else {
             errors.push(message)
           }

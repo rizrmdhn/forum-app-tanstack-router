@@ -1,22 +1,28 @@
-import type { IThread } from "@/types"
-import { formatDistanceToNow } from "date-fns"
-import { MessageSquare, ThumbsDown, ThumbsUp } from "lucide-react"
-import { Link } from "@tanstack/react-router"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
-import { Badge } from "./ui/badge"
-import { Button } from "./ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card"
-import { Skeleton } from "./ui/skeleton"
+import type { IThread } from '@/types';
+import { formatDistanceToNow } from 'date-fns';
+import { MessageSquare, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
+import { Skeleton } from './ui/skeleton';
 
 interface ThreadCardProps {
-  thread: IThread
-  enableVote?: boolean
-  ownerName?: string
-  ownerAvatar?: string
-  onUpVote?: (threadId: string) => void
-  onDownVote?: (threadId: string) => void
-  onNeutralVote?: (threadId: string) => void
-  currentUserId?: string
+  thread: IThread;
+  enableVote?: boolean;
+  ownerName?: string;
+  ownerAvatar?: string;
+  onUpVote?: (threadId: string) => void;
+  onDownVote?: (threadId: string) => void;
+  onNeutralVote?: (threadId: string) => void;
+  currentUserId?: string;
 }
 
 export function ThreadCardSkeleton() {
@@ -44,7 +50,7 @@ export function ThreadCardSkeleton() {
         <Skeleton className="ml-auto h-3 w-10 rounded" />
       </CardFooter>
     </Card>
-  )
+  );
 }
 
 export function ThreadCard({
@@ -59,26 +65,26 @@ export function ThreadCard({
 }: ThreadCardProps) {
   const hasUpVoted = currentUserId
     ? thread.upVotesBy.includes(currentUserId)
-    : false
+    : false;
   const hasDownVoted = currentUserId
     ? thread.downVotesBy.includes(currentUserId)
-    : false
+    : false;
 
   function handleUpVote() {
-    if (!enableVote) return
+    if (!enableVote) return;
     if (hasUpVoted) {
-      onNeutralVote?.(thread.id)
+      onNeutralVote?.(thread.id);
     } else {
-      onUpVote?.(thread.id)
+      onUpVote?.(thread.id);
     }
   }
 
   function handleDownVote() {
-    if (!enableVote) return
+    if (!enableVote) return;
     if (hasDownVoted) {
-      onNeutralVote?.(thread.id)
+      onNeutralVote?.(thread.id);
     } else {
-      onDownVote?.(thread.id)
+      onDownVote?.(thread.id);
     }
   }
 
@@ -124,19 +130,19 @@ export function ThreadCard({
 
       <CardFooter className="gap-2">
         <Button
-          variant={hasUpVoted ? "default" : "outline"}
+          variant={hasUpVoted ? 'default' : 'outline'}
           size="sm"
           disabled={!enableVote}
-          onClick={handleUpVote}
+          onClick={() => handleUpVote()}
         >
           <ThumbsUp />
           {thread.upVotesBy.length}
         </Button>
         <Button
-          variant={hasDownVoted ? "destructive" : "outline"}
+          variant={hasDownVoted ? 'destructive' : 'outline'}
           size="sm"
           disabled={!enableVote}
-          onClick={handleDownVote}
+          onClick={() => handleDownVote()}
         >
           <ThumbsDown />
           {thread.downVotesBy.length}
@@ -147,5 +153,5 @@ export function ThreadCard({
         </div>
       </CardFooter>
     </Card>
-  )
+  );
 }

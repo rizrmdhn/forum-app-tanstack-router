@@ -240,5 +240,8 @@ function applyToArray<TItem, TInput>(
 
     case "create":
       return [...items, operation.getOptimisticItem(input)]
+
+    default:
+      return items
   }
 }

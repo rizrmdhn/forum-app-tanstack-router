@@ -1,9 +1,9 @@
-import { Filter, Search } from "lucide-react"
-import { InputGroup, InputGroupAddon, InputGroupInput } from "./ui/input-group"
-import { Button } from "./ui/button"
-import { Badge } from "./ui/badge"
-import { useThread } from "@/hooks/use-thread"
-import { useNavigate, useSearch } from "@tanstack/react-router"
+import { Filter, Search } from 'lucide-react';
+import { useNavigate, useSearch } from '@tanstack/react-router';
+import { useThread } from '@/hooks/use-thread';
+import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
 import {
   Sheet,
   SheetContent,
@@ -11,37 +11,40 @@ import {
   SheetTitle,
   SheetTrigger,
   SheetFooter,
-} from "./ui/sheet"
+} from './ui/sheet';
 
 export function NavBar() {
-  const navigate = useNavigate()
-  const { search, categories } = useSearch({ from: "/" })
+  const navigate = useNavigate();
+  const { search, categories } = useSearch({ from: '/' });
 
-  const { data: allThreads } = useThread()
-  const { data: filteredThreads } = useThread(search, categories)
+  const { data: allThreads } = useThread();
+  const { data: filteredThreads } = useThread(search, categories);
 
   const uniqueCategories = [
     ...new Set((allThreads ?? []).map((t) => t.category).filter(Boolean)),
-  ].sort()
+  ].sort();
 
-  const selectedCategories = categories ?? []
-  const hasActiveFilter = selectedCategories.length > 0
+  const selectedCategories = categories ?? [];
+  const hasActiveFilter = selectedCategories.length > 0;
 
   function toggleCategory(cat: string) {
     const next = selectedCategories.includes(cat)
       ? selectedCategories.filter((c) => c !== cat)
-      : [...selectedCategories, cat]
+      : [...selectedCategories, cat];
     navigate({
-      to: "/",
-      search: (prev) => ({ ...prev, categories: next.length ? next : undefined }),
-    })
+      to: '/',
+      search: (prev) => ({
+        ...prev,
+        categories: next.length ? next : undefined,
+      }),
+    });
   }
 
   function clearCategories() {
     navigate({
-      to: "/",
+      to: '/',
       search: (prev) => ({ ...prev, categories: undefined }),
-    })
+    });
   }
 
   return (
@@ -73,13 +76,17 @@ export function NavBar() {
 
           <div className="flex flex-wrap gap-2 px-4 py-2">
             {uniqueCategories.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Tidak ada kategori.</p>
+              <p className="text-sm text-muted-foreground">
+                Tidak ada kategori.
+              </p>
             ) : (
               uniqueCategories.map((cat) => (
                 <Badge
                   key={cat}
-                  variant={selectedCategories.includes(cat) ? "default" : "outline"}
-                  className="cursor-pointer select-none text-sm"
+                  variant={
+                    selectedCategories.includes(cat) ? 'default' : 'outline'
+                  }
+                  className="cursor-pointer text-sm select-none"
                   onClick={() => toggleCategory(cat)}
                 >
                   #{cat}
@@ -90,7 +97,11 @@ export function NavBar() {
 
           {hasActiveFilter && (
             <SheetFooter>
-              <Button variant="outline" size="sm" onClick={clearCategories}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => clearCategories()}
+              >
                 Hapus Filter
               </Button>
             </SheetFooter>
@@ -99,13 +110,13 @@ export function NavBar() {
       </Sheet>
 
       {/* Search bar */}
-      <InputGroup className="w-full min-w-0 max-w-xs sm:max-w-sm">
+      <InputGroup className="w-full max-w-xs min-w-0 sm:max-w-sm">
         <InputGroupInput
           placeholder="Search..."
           value={search}
           onChange={(e) =>
             navigate({
-              to: "/",
+              to: '/',
               search: (prev) => ({
                 ...prev,
                 search: e.target.value || undefined,
@@ -123,5 +134,5 @@ export function NavBar() {
 
       <h1 className="hidden shrink-0 text-xl font-bold sm:block">Forums App</h1>
     </nav>
-  )
+  );
 }
