@@ -1,14 +1,14 @@
 import type { IUser } from "@/types"
 import type { AuthUserAction } from "./action"
 
-export type IState = IUser | null
+export type AuthState = IUser | null
 
-const initialState: IState = null
+const initialState: AuthState = null
 
 function authReducer(
-  state: IState = initialState,
+  state: AuthState = initialState,
   action: AuthUserAction
-): IState {
+): AuthState {
   switch (action.type) {
     case "RECEIVE_AUTH_USER":
       return action.payload.authUser

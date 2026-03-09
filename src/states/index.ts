@@ -1,5 +1,5 @@
 import { configureStore, type Reducer } from "@reduxjs/toolkit"
-import authReducer, { type IState as AuthState } from "./auth/reducer"
+import authReducer, { type AuthState } from "./auth/reducer"
 
 export const store = configureStore({
   reducer: {

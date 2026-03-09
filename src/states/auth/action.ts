@@ -1,4 +1,4 @@
-import type { IUser } from "@/types"
+import type { ActionInterface, IUser } from "@/types"
 
 const ActionType = {
   RECEIVE_AUTH_USER: "RECEIVE_AUTH_USER",
@@ -7,16 +7,12 @@ const ActionType = {
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType]
 
-interface ReceiveAuthUserAction {
-  type: typeof ActionType.RECEIVE_AUTH_USER
-  payload: { authUser: IUser }
-  [key: string]: unknown
-}
+type ReceiveAuthUserAction = ActionInterface<
+  typeof ActionType.RECEIVE_AUTH_USER,
+  { authUser: IUser }
+>
 
-interface UnsetAuthUserAction {
-  type: typeof ActionType.UNSET_AUTH_USER
-  [key: string]: unknown
-}
+type UnsetAuthUserAction = ActionInterface<typeof ActionType.UNSET_AUTH_USER>
 
 export type AuthUserAction = ReceiveAuthUserAction | UnsetAuthUserAction
 

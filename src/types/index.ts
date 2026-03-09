@@ -1,3 +1,7 @@
+export type ActionInterface<T extends string, P = never> = [P] extends [never]
+  ? { type: T; [key: string]: unknown }
+  : { type: T; payload: P; [key: string]: unknown }
+
 export interface IUser {
   id: string
   name: string

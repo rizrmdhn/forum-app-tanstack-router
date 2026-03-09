@@ -2,12 +2,13 @@ import { useQuery } from "@tanstack/react-query"
 import { useAppDispatch } from "@/hooks/use-store"
 import { receiveAuthUserActionCreator } from "@/states/auth/action"
 import api from "@/lib/api"
+import { authUserKeys } from "@/lib/query-keys"
 
 export function useAuthUser() {
   const dispatch = useAppDispatch()
 
   return useQuery({
-    queryKey: ["authUser"],
+    queryKey: authUserKeys.profile(),
     queryFn: async () => {
       const user = await api.getOwnProfile()
       // Sync ke Redux setelah berhasil fetch
