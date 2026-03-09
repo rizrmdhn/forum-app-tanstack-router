@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npx eslint src/states/auth/action.ts)",
-      "Bash(\"e:\\\\Dicoding\\\\Menjadi React Web Developer Expert\\\\forums-app\\\\src\\\\components\\\\thread-card.tsx\")"
-    ]
-  }
-}
