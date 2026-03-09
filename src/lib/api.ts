@@ -1,4 +1,4 @@
-import type { IComment, IDetailThread, IThread, IUser } from "@/types"
+import type { IComment, IDetailThread, ILeaderboard, IThread, IUser } from "@/types"
 
 const BASE_URL = "https://forum-api.dicoding.dev/v1"
 
@@ -164,9 +164,9 @@ async function neutralVoteComment({
   )
 }
 
-async function getLeaderboards() {
+async function getLeaderboards(): Promise<ILeaderboard[]> {
   const data = await fetchJSON(`${BASE_URL}/leaderboards`)
-  return data.leaderboards
+  return data.leaderboards as ILeaderboard[]
 }
 
 const api = {

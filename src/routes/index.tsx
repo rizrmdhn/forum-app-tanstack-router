@@ -1,37 +1,77 @@
-import { Button } from "@/components/ui/button"
+import { ThreadCard, ThreadCardSkeleton } from "@/components/thread-card"
 import { useAppSelector } from "../hooks/use-store"
 import { createFileRoute } from "@tanstack/react-router"
+import z from "zod"
+import { useThread } from "@/hooks/use-thread"
+import { useUsers } from "@/hooks/use-users"
+import { NavBar } from "@/components/nav-bar"
+import { BottomNavBar } from "@/components/bottom-nav-bar"
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty"
+import { LayoutList } from "lucide-react"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export const Route = createFileRoute("/")({
+  validateSearch: z.object({
+    search: z.string().optional(),
+    category: z.string().optional(),
+  }),
   component: HomeComponent,
 })
 
 function HomeComponent() {
+  const { search } = Route.useSearch()
   const auth = useAppSelector((state) => state.auth)
+  const { data: threads, isLoading: isThreadsLoading } = useThread(search)
+  const { data: users, isLoading: isUsersLoading } = useUsers()
+
+  const isLoading = isThreadsLoading || isUsersLoading
+  const isEmpty = !isLoading && threads?.length === 0
 
   return (
-    <div className="flex min-h-svh p-6">
-      <div className="flex max-w-md min-w-0 flex-col gap-4 text-sm leading-loose">
-        <div>
-          <h1 className="font-medium">Project ready!</h1>
-          <p>You may now add components and start building.</p>
-          <p>We&apos;ve already added the button component for you.</p>
-          <Button className="mt-2">Button</Button>
+    <div className="grid h-svh grid-rows-[auto_1fr_auto]">
+      <NavBar />
+      <ScrollArea className="min-h-0">
+        <div className="mx-auto max-w-2xl space-y-4 p-4">
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <ThreadCardSkeleton key={i} />
+            ))
+          : threads?.map((thread) => {
+              const owner = users?.find((u) => u.id === thread.ownerId)
+              return (
+                <ThreadCard
+                  key={thread.id}
+                  thread={thread}
+                  currentUserId={auth?.id}
+                  ownerName={owner?.name}
+                  ownerAvatar={owner?.avatar}
+                />
+              )
+            })}
+        {isEmpty && (
+          <Empty className="mt-12">
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <LayoutList />
+              </EmptyMedia>
+              <EmptyTitle>Tidak ada thread</EmptyTitle>
+              <EmptyDescription>
+                {search
+                  ? `Tidak ada thread yang cocok dengan "${search}".`
+                  : "Belum ada thread yang dibuat."}
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        )}
         </div>
-        <div className="font-mono text-xs text-muted-foreground">
-          (Press <kbd>d</kbd> to toggle dark mode)
-        </div>
-        <div className="rounded-md bg-red-100 p-4">
-          <div className="flex">
-            <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Auth State</h3>
-              <pre className="mt-2 text-xs text-red-700">
-                {JSON.stringify(auth, null, 2)}
-              </pre>
-            </div>
-          </div>
-        </div>
-      </div>
+      </ScrollArea>
+      <BottomNavBar />
     </div>
   )
 }

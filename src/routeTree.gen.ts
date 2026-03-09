@@ -9,13 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LeaderboardsRouteImport } from './routes/leaderboards'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ThreadsThreadIdRouteImport } from './routes/threads/$threadId'
 import { Route as authRegisterRouteImport } from './routes/(auth)/register'
 import { Route as authLoginRouteImport } from './routes/(auth)/login'
 
+const LeaderboardsRoute = LeaderboardsRouteImport.update({
+  id: '/leaderboards',
+  path: '/leaderboards',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ThreadsThreadIdRoute = ThreadsThreadIdRouteImport.update({
+  id: '/threads/$threadId',
+  path: '/threads/$threadId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const authRegisterRoute = authRegisterRouteImport.update({
@@ -31,41 +43,74 @@ const authLoginRoute = authLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/leaderboards': typeof LeaderboardsRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/threads/$threadId': typeof ThreadsThreadIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/leaderboards': typeof LeaderboardsRoute
   '/login': typeof authLoginRoute
   '/register': typeof authRegisterRoute
+  '/threads/$threadId': typeof ThreadsThreadIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/leaderboards': typeof LeaderboardsRoute
   '/(auth)/login': typeof authLoginRoute
   '/(auth)/register': typeof authRegisterRoute
+  '/threads/$threadId': typeof ThreadsThreadIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/leaderboards'
+    | '/login'
+    | '/register'
+    | '/threads/$threadId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
-  id: '__root__' | '/' | '/(auth)/login' | '/(auth)/register'
+  to: '/' | '/leaderboards' | '/login' | '/register' | '/threads/$threadId'
+  id:
+    | '__root__'
+    | '/'
+    | '/leaderboards'
+    | '/(auth)/login'
+    | '/(auth)/register'
+    | '/threads/$threadId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LeaderboardsRoute: typeof LeaderboardsRoute
   authLoginRoute: typeof authLoginRoute
   authRegisterRoute: typeof authRegisterRoute
+  ThreadsThreadIdRoute: typeof ThreadsThreadIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/leaderboards': {
+      id: '/leaderboards'
+      path: '/leaderboards'
+      fullPath: '/leaderboards'
+      preLoaderRoute: typeof LeaderboardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/threads/$threadId': {
+      id: '/threads/$threadId'
+      path: '/threads/$threadId'
+      fullPath: '/threads/$threadId'
+      preLoaderRoute: typeof ThreadsThreadIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(auth)/register': {
@@ -87,8 +132,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LeaderboardsRoute: LeaderboardsRoute,
   authLoginRoute: authLoginRoute,
   authRegisterRoute: authRegisterRoute,
+  ThreadsThreadIdRoute: ThreadsThreadIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
