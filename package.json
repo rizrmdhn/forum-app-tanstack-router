@@ -13,7 +13,10 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:headless": "cypress run --headless"
   },
   "dependencies": {
     "@base-ui/react": "^1.2.0",
@@ -64,6 +67,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/coverage-v8": "^4.0.18",
+    "cypress": "^15.11.0",
     "eslint": "^9.39.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
