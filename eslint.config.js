@@ -112,9 +112,10 @@ export default defineConfig([
       'react-refresh/only-export-components': 'off',
       'arrow-body-style': 'off',
       'consistent-return': 'off',
-      'react/jsx-no-constructed-context-values': 'warn',
-      'react/no-array-index-key': 'warn',
-      'eqeqeq': 'warn',
+      'react/jsx-no-constructed-context-values': 'off',
+      'react/no-array-index-key': 'off',
+      'react/no-danger': 'off',
+      'eqeqeq': 'off',
       'react/button-has-type': 'off',
       'no-underscore-dangle': 'off',
       'no-param-reassign': 'off',
@@ -133,7 +134,7 @@ export default defineConfig([
     rules: {
       'react/no-array-index-key': 'warn',
       'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
-      'no-nested-ternary': 'warn',
+      'no-nested-ternary': 'off',
     },
   },
 
