@@ -1,4 +1,6 @@
 import type { ActionInterface, IUser } from "@/types"
+import type { AppDispatch } from "@/states"
+import api from "@/lib/api"
 
 const ActionType = {
   RECEIVE_AUTH_USER: "RECEIVE_AUTH_USER",
@@ -25,4 +27,25 @@ export function receiveAuthUserActionCreator(
 
 export function unsetAuthUserActionCreator(): UnsetAuthUserAction {
   return { type: ActionType.UNSET_AUTH_USER }
+}
+
+export function asyncLogin({
+  email,
+  password,
+}: {
+  email: string
+  password: string
+}) {
+  return async (dispatch: AppDispatch) => {
+    await api.login({ email, password })
+    const authUser = await api.getOwnProfile()
+    dispatch(receiveAuthUserActionCreator(authUser))
+  }
+}
+
+export function asyncLogout() {
+  return (dispatch: AppDispatch) => {
+    api.putAccessToken("")
+    dispatch(unsetAuthUserActionCreator())
+  }
 }
