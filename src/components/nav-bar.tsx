@@ -1,6 +1,6 @@
 import { Filter, Search } from 'lucide-react';
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useThread } from '@/hooks/use-thread';
+import { useAppSelector } from '@/hooks/use-store';
 import { InputGroup, InputGroupAddon, InputGroupInput } from './ui/input-group';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -17,11 +17,10 @@ export function NavBar() {
   const navigate = useNavigate();
   const { search, categories } = useSearch({ from: '/' });
 
-  const { data: allThreads } = useThread();
-  const { data: filteredThreads } = useThread(search, categories);
+  const { data: threads, status } = useAppSelector((state) => state.thread);
 
   const uniqueCategories = [
-    ...new Set((allThreads ?? []).map((t) => t.category).filter(Boolean)),
+    ...new Set((threads ?? []).map((t) => t.category).filter(Boolean)),
   ].sort();
 
   const selectedCategories = categories ?? [];
@@ -46,6 +45,16 @@ export function NavBar() {
       search: (prev) => ({ ...prev, categories: undefined }),
     });
   }
+
+  const filteredThreads = threads?.filter((thread) => {
+    const matchesSearch = thread.title
+      .toLowerCase()
+      .includes(search?.toLowerCase() ?? '');
+    const matchesCategory = categories
+      ? categories.includes(thread.category)
+      : true;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <nav className="flex items-center justify-between gap-2 bg-primary p-4 text-primary-foreground">
@@ -128,7 +137,9 @@ export function NavBar() {
           <Search />
         </InputGroupAddon>
         <InputGroupAddon align="inline-end" className="hidden sm:flex">
-          {filteredThreads?.length} Threads
+          {status === 'success'
+            ? `${filteredThreads?.length ?? 0} dari ${threads?.length ?? 0} thread`
+            : 'Memuat...'}
         </InputGroupAddon>
       </InputGroup>
 

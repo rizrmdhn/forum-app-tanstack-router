@@ -42,14 +42,14 @@ async function register({
   name: string
   email: string
   password: string
-}) {
+}): Promise<void> {
   await fetchJSON(`${BASE_URL}/register`, {
     method: "POST",
     ...jsonBody({ name, email, password }),
   })
 }
 
-async function login({ email, password }: { email: string; password: string }) {
+async function login({ email, password }: { email: string; password: string }): Promise<void> {
   const data = await fetchJSON(`${BASE_URL}/login`, {
     method: "POST",
     ...jsonBody({ email, password }),
@@ -107,19 +107,19 @@ async function createComment({
   return data.comment as IComment
 }
 
-async function upVoteThread(threadId: string) {
+async function upVoteThread(threadId: string): Promise<void> {
   await fetchWithAuth(`${BASE_URL}/threads/${threadId}/up-vote`, {
     method: "POST",
   })
 }
 
-async function downVoteThread(threadId: string) {
+async function downVoteThread(threadId: string): Promise<void> {
   await fetchWithAuth(`${BASE_URL}/threads/${threadId}/down-vote`, {
     method: "POST",
   })
 }
 
-async function neutralVoteThread(threadId: string) {
+async function neutralVoteThread(threadId: string): Promise<void> {
   await fetchWithAuth(`${BASE_URL}/threads/${threadId}/neutral-vote`, {
     method: "POST",
   })
@@ -131,7 +131,7 @@ async function upVoteComment({
 }: {
   threadId: string
   commentId: string
-}) {
+}): Promise<void> {
   await fetchWithAuth(
     `${BASE_URL}/threads/${threadId}/comments/${commentId}/up-vote`,
     { method: "POST" }
@@ -144,7 +144,7 @@ async function downVoteComment({
 }: {
   threadId: string
   commentId: string
-}) {
+}): Promise<void> {
   await fetchWithAuth(
     `${BASE_URL}/threads/${threadId}/comments/${commentId}/down-vote`,
     { method: "POST" }
@@ -157,7 +157,7 @@ async function neutralVoteComment({
 }: {
   threadId: string
   commentId: string
-}) {
+}): Promise<void> {
   await fetchWithAuth(
     `${BASE_URL}/threads/${threadId}/comments/${commentId}/neutral-vote`,
     { method: "POST" }

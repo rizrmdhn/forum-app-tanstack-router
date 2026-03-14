@@ -2,6 +2,7 @@ import type { ActionInterface } from "@/types"
 import type { AppDispatch } from "@/states"
 import { receiveAuthUserActionCreator } from "@/states/auth/action"
 import api from "@/lib/api"
+import { asyncHandler } from "@/lib/async-handler"
 
 const ActionType = {
   SET_IS_PRELOAD: "SET_IS_PRELOAD",
@@ -23,14 +24,14 @@ export function setIsPreloadActionCreator(
 }
 
 export function asyncSetIsPreload() {
-  return async (dispatch: AppDispatch) => {
-    try {
+  return asyncHandler<AppDispatch>(
+    async (dispatch) => {
       const authUser = await api.getOwnProfile()
       dispatch(receiveAuthUserActionCreator(authUser))
-    } catch {
-      dispatch(setIsPreloadActionCreator(null))
-    } finally {
-      dispatch(setIsPreloadActionCreator(false))
+    },
+    {
+      onError: (dispatch) => dispatch(setIsPreloadActionCreator(null)),
+      onFinally: (dispatch) => dispatch(setIsPreloadActionCreator(false)),
     }
-  }
+  )
 }
