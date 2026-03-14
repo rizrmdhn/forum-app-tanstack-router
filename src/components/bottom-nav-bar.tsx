@@ -2,6 +2,7 @@ import { useAppSelector } from '@/hooks/use-store';
 import { useLogout } from '@/hooks/use-logout';
 import { Link } from '@tanstack/react-router';
 import { LayoutList, LogIn, LogOut, Trophy } from 'lucide-react';
+import { TEST_IDS } from '@/test-ids';
 
 const navItems = [
   { to: '/leaderboards', label: 'Leaderboard', icon: Trophy },
@@ -28,6 +29,7 @@ export function BottomNavBar() {
         <button
           type="button"
           onClick={() => logout()}
+          data-testid={TEST_IDS.NAV_BAR.LOGOUT_BUTTON}
           className="flex flex-col items-center gap-0.5 text-xs text-muted-foreground"
         >
           <LogOut className="size-5" />
@@ -36,6 +38,7 @@ export function BottomNavBar() {
       ) : (
         <Link
           to="/login"
+          data-testid={TEST_IDS.NAV_BAR.LOGIN_BUTTON}
           className="flex flex-col items-center gap-0.5 text-xs text-muted-foreground [&.active]:text-primary"
         >
           <LogIn className="size-5" />

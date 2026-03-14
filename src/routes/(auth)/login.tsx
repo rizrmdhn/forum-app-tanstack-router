@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form"
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema"
 import { loginSchema, type LoginInput } from "@/lib/schemas/auth.schema"
 import { useLogin } from "@/hooks/use-login"
+import { TEST_IDS } from "@/test-ids"
 import {
   Card,
   CardContent,
@@ -52,6 +53,7 @@ function RouteComponent() {
                 id="email"
                 type="email"
                 placeholder="nama@email.com"
+                data-testid={TEST_IDS.LOGIN.EMAIL_INPUT}
                 {...register("email")}
               />
               <FieldError errors={[errors.email]} />
@@ -62,13 +64,14 @@ function RouteComponent() {
                 id="password"
                 type="password"
                 placeholder="••••••••"
+                data-testid={TEST_IDS.LOGIN.PASSWORD_INPUT}
                 {...register("password")}
               />
               <FieldError errors={[errors.password]} />
             </Field>
           </CardContent>
           <CardFooter className="flex flex-col gap-3">
-            <Button type="submit" className="w-full" disabled={isPending}>
+            <Button type="submit" className="w-full" disabled={isPending} data-testid={TEST_IDS.LOGIN.SUBMIT}>
               {isPending ? "Memproses..." : "Login"}
             </Button>
             <p className="text-sm text-muted-foreground text-center">
