@@ -57,7 +57,7 @@ export function NavBar() {
   });
 
   return (
-    <nav className="flex items-center justify-between gap-2 bg-primary p-4 text-primary-foreground">
+    <nav className="flex h-navbar items-center justify-between gap-2 bg-primary px-4 text-primary-foreground">
       {/* Filter sheet */}
       <Sheet>
         <SheetTrigger

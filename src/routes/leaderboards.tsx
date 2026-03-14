@@ -23,7 +23,7 @@ function LeaderboardsComponent() {
 
   return (
     <div className="grid h-svh grid-rows-[auto_1fr_auto]">
-      <nav className="flex items-center justify-center border-b bg-primary p-4 text-primary-foreground">
+      <nav className="flex h-navbar items-center justify-center border-b bg-primary px-4 text-primary-foreground">
         <p className="font-semibold">Klasemen Pengguna Aktif</p>
       </nav>
       <div className="mx-auto w-full max-w-2xl space-y-2 overflow-y-auto p-4">
