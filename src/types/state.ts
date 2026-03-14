@@ -4,22 +4,22 @@ type SuccessStateInterface<T> = {
   error: null;
 };
 
-type ErrorStateInterface = {
+type ErrorStateInterface<T> = {
   status: 'error';
-  data: null;
+  data: T | null;
   error: string;
 };
 
-type LoadingStateInterface = {
+type LoadingStateInterface<T> = {
   status: 'loading';
-  data: null;
+  data: T | null;
   error: null;
 };
 
 export type StateInterface<T> =
   | SuccessStateInterface<T>
-  | ErrorStateInterface
-  | LoadingStateInterface;
+  | ErrorStateInterface<T>
+  | LoadingStateInterface<T>;
 
 export type ActionInterface<T extends string, P = never> = [P] extends [never]
   ? { type: T; [key: string]: unknown }

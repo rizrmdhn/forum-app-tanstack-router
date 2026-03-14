@@ -42,7 +42,10 @@ function HomeComponent() {
   );
   const { mutate: voteThread } = useVoteThreadList();
 
-  const isLoading = status === 'loading' || usersStatus === 'loading';
+  const hasLocalThreads = Array.isArray(threads) && threads.length > 0;
+
+  const isLoading =
+    (status === 'loading' || usersStatus === 'loading') && !hasLocalThreads;
   const isEmpty = !isLoading && threads?.length === 0;
 
   const filteredThreads = threads?.filter((thread) => {

@@ -1,5 +1,5 @@
 import type { ActionInterface, StateInterface, IDetailThread } from '@/types';
-import type { AppDispatch } from '@/states';
+import type { AppDispatch, RootState } from '@/states';
 import api from '@/lib/api';
 import { asyncHandler } from '@/lib/async-handler';
 
@@ -20,7 +20,9 @@ type UpdateDetailThreadAction = ActionInterface<
   Partial<IDetailThread>
 >;
 
-export type DetailThreadAction = SetDetailThreadAction | UpdateDetailThreadAction;
+export type DetailThreadAction =
+  | SetDetailThreadAction
+  | UpdateDetailThreadAction;
 
 export function setDetailThreadActionCreator(
   state: StateInterface<IDetailThread>
@@ -35,12 +37,13 @@ export function updateDetailThreadActionCreator(
 }
 
 export function asyncLoadDetailThread(threadId: string) {
-  return asyncHandler<AppDispatch>(
-    async (dispatch) => {
+  return asyncHandler<AppDispatch, RootState>(
+    async (dispatch, getState) => {
+      const state = getState();
       dispatch(
         setDetailThreadActionCreator({
           status: 'loading',
-          data: null,
+          data: state.detailThread.data,
           error: null,
         })
       );

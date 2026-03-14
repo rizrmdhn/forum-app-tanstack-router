@@ -1,5 +1,5 @@
 import type { ActionInterface, StateInterface, ILeaderboard } from '@/types';
-import type { AppDispatch } from '@/states';
+import type { AppDispatch, RootState } from '@/states';
 import api from '@/lib/api';
 import { asyncHandler } from '@/lib/async-handler';
 
@@ -23,12 +23,13 @@ export function setLeaderboardActionCreator(
 }
 
 export function asyncLoadLeaderboard() {
-  return asyncHandler<AppDispatch>(
-    async (dispatch) => {
+  return asyncHandler<AppDispatch, RootState>(
+    async (dispatch, getState) => {
+      const state = getState();
       dispatch(
         setLeaderboardActionCreator({
           status: 'loading',
-          data: null,
+          data: state.leaderboard.data,
           error: null,
         })
       );

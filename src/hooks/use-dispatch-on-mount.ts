@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
-import type { AppDispatch } from '@/states';
+import type { AppDispatch, RootState } from '@/states';
 import { useAppDispatch } from './use-store';
 
-type Thunk = (dispatch: AppDispatch) => void | Promise<void>;
+type Thunk = (
+  dispatch: AppDispatch,
+  getState: () => RootState
+) => void | Promise<void>;
 
 export function useDispatchOnMount(...thunks: Thunk[]) {
   const dispatch = useAppDispatch();

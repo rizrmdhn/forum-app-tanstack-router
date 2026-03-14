@@ -17,7 +17,7 @@ export function NavBar() {
   const navigate = useNavigate();
   const { search, categories } = useSearch({ from: '/' });
 
-  const { data: threads, status } = useAppSelector((state) => state.thread);
+  const { data: threads } = useAppSelector((state) => state.thread);
 
   const uniqueCategories = [
     ...new Set((threads ?? []).map((t) => t.category).filter(Boolean)),
@@ -137,7 +137,7 @@ export function NavBar() {
           <Search />
         </InputGroupAddon>
         <InputGroupAddon align="inline-end" className="hidden sm:flex">
-          {status === 'success'
+          {threads != null
             ? `${filteredThreads?.length ?? 0} dari ${threads?.length ?? 0} thread`
             : 'Memuat...'}
         </InputGroupAddon>

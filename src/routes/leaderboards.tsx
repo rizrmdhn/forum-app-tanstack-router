@@ -8,7 +8,10 @@ import { useAppSelector } from '@/hooks/use-store';
 import { asyncLoadLeaderboard } from '@/states/leaderboard/action';
 import { createFileRoute } from '@tanstack/react-router';
 
-const SKELETON_KEYS = Array.from({ length: 8 }, (_, i) => `leaderboard-skeleton-${i}`);
+const SKELETON_KEYS = Array.from(
+  { length: 8 },
+  (_, i) => `leaderboard-skeleton-${i}`
+);
 
 export const Route = createFileRoute('/leaderboards')({
   component: LeaderboardsComponent,
@@ -21,13 +24,18 @@ function LeaderboardsComponent() {
     (state) => state.leaderboard
   );
 
+  const hasLocalLeaderboards =
+    Array.isArray(leaderboards) && leaderboards.length > 0;
+
+  const isLoading = status === 'loading' && !hasLocalLeaderboards;
+
   return (
     <div className="grid h-svh grid-rows-[auto_1fr_auto]">
       <nav className="flex h-navbar items-center justify-center border-b bg-primary px-4 text-primary-foreground">
         <p className="font-semibold">Klasemen Pengguna Aktif</p>
       </nav>
       <div className="mx-auto w-full max-w-2xl space-y-2 overflow-y-auto p-4">
-        {status === 'loading'
+        {isLoading
           ? SKELETON_KEYS.map((key) => <LeaderboardCardSkeleton key={key} />)
           : leaderboards?.map((entry, index, arr) => {
               const rank =
@@ -35,7 +43,11 @@ function LeaderboardsComponent() {
                   ? arr.findIndex((e) => e.score === entry.score) + 1
                   : index + 1;
               return (
-                <LeaderboardCard key={entry.user.id} entry={entry} rank={rank} />
+                <LeaderboardCard
+                  key={entry.user.id}
+                  entry={entry}
+                  rank={rank}
+                />
               );
             })}
       </div>

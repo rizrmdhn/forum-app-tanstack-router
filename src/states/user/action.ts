@@ -1,5 +1,5 @@
 import type { ActionInterface, StateInterface, IUser } from '@/types';
-import type { AppDispatch } from '@/states';
+import type { AppDispatch, RootState } from '@/states';
 import api from '@/lib/api';
 import { asyncHandler } from '@/lib/async-handler';
 
@@ -23,10 +23,15 @@ export function setUsersActionCreator(
 }
 
 export function asyncLoadUsers() {
-  return asyncHandler<AppDispatch>(
-    async (dispatch) => {
+  return asyncHandler<AppDispatch, RootState>(
+    async (dispatch, getState) => {
+      const state = getState();
       dispatch(
-        setUsersActionCreator({ status: 'loading', data: null, error: null })
+        setUsersActionCreator({
+          status: 'loading',
+          data: state.user.data,
+          error: null,
+        })
       );
       const users = await api.getAllUsers();
       dispatch(

@@ -1,5 +1,5 @@
 import type { ActionInterface, StateInterface, IThread } from '@/types';
-import type { AppDispatch } from '@/states';
+import type { AppDispatch, RootState } from '@/states';
 import api from '@/lib/api';
 import { asyncHandler } from '@/lib/async-handler';
 
@@ -17,10 +17,7 @@ type SetThreadsAction = ActionInterface<
   StateInterface<IThread[]>
 >;
 
-type AddThreadAction = ActionInterface<
-  typeof ActionType.ADD_THREAD,
-  IThread
->;
+type AddThreadAction = ActionInterface<typeof ActionType.ADD_THREAD, IThread>;
 
 type UpdateThreadAction = ActionInterface<
   typeof ActionType.UPDATE_THREAD,
@@ -62,21 +59,36 @@ export function setThreadsActionCreator(
 }
 
 export function asyncLoadThreads() {
-  return asyncHandler<AppDispatch>(
-    async (dispatch) => {
-      dispatch(setThreadsActionCreator({ status: 'loading', data: null, error: null }));
+  return asyncHandler<AppDispatch, RootState>(
+    async (dispatch, getState) => {
+      const existing = getState().thread.data;
+      dispatch(
+        setThreadsActionCreator({
+          status: 'loading',
+          data: existing,
+          error: null,
+        })
+      );
       const threads = await api.getAllThreads();
-      dispatch(setThreadsActionCreator({ status: 'success', data: threads, error: null }));
+      dispatch(
+        setThreadsActionCreator({
+          status: 'success',
+          data: threads,
+          error: null,
+        })
+      );
     },
     {
-      onError: (dispatch, error) =>
+      onError: (dispatch, error, getState) => {
+        const existing = getState().thread.data;
         dispatch(
           setThreadsActionCreator({
             status: 'error',
-            data: null,
+            data: existing,
             error: (error as Error).message,
           })
-        ),
+        );
+      },
     }
   );
 }
