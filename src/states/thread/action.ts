@@ -5,10 +5,7 @@ import { asyncHandler } from '@/lib/async-handler';
 
 const ActionType = {
   SET_THREADS: 'SET_THREADS',
-  ADD_THREAD: 'ADD_THREAD',
-  UP_VOTE_THREAD: 'UP_VOTE_THREAD',
-  DOWN_VOTE_THREAD: 'DOWN_VOTE_THREAD',
-  NEUTRAL_VOTE_THREAD: 'NEUTRAL_VOTE_THREAD',
+  UPDATE_THREAD: 'UPDATE_THREAD',
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];
@@ -18,7 +15,18 @@ type SetThreadsAction = ActionInterface<
   StateInterface<IThread[]>
 >;
 
-export type ThreadAction = SetThreadsAction;
+type UpdateThreadAction = ActionInterface<
+  typeof ActionType.UPDATE_THREAD,
+  Partial<IThread> & { id: string }
+>;
+
+export type ThreadAction = SetThreadsAction | UpdateThreadAction;
+
+export function updateThreadActionCreator(
+  thread: Partial<IThread> & { id: string }
+): UpdateThreadAction {
+  return { type: ActionType.UPDATE_THREAD, payload: thread };
+}
 
 export function setThreadsActionCreator(
   state: StateInterface<IThread[]>

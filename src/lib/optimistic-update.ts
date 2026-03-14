@@ -81,6 +81,8 @@ interface UseOptimisticMutationOptions<
   queryOptions: { queryKey: QueryKey }
   /** What kind of optimistic change to apply */
   operation: OptimisticOperation<TInput, InferItem<TQueryData>>
+  /** Called right before the mutation fires (after cache cancel & snapshot) */
+  onMutate?: (input: TInput) => void | Promise<void>
   /** Called after the server confirms success (after optimistic) */
   onSuccess?: (data: TMutationData) => Promise<void> | void
   /** Called when the mutation fails (after rollback) */
@@ -130,6 +132,7 @@ export function useOptimisticMutation<
   {
     queryOptions,
     operation,
+    onMutate: onMutateCallback,
     onSuccess,
     onError,
     onSettled,
@@ -154,6 +157,8 @@ export function useOptimisticMutation<
           return applyOptimisticUpdate(old, input, operation)
         })
       }
+
+      await onMutateCallback?.(input)
 
       return { previous: previous as TQueryData }
     },
