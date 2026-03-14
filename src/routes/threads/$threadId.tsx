@@ -1,5 +1,4 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router';
-import { useThreadDetail } from '@/hooks/use-thread-detail';
 import { useCreateComment } from '@/hooks/use-create-comment';
 import { useVoteComment } from '@/hooks/use-vote-comment';
 import { useVoteThread } from '@/hooks/use-vote-thread';
@@ -23,6 +22,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { SafeHTML } from '@/components/safe-html';
+import { useDispatchOnMount } from '@/hooks/use-dispatch-on-mount';
+import { asyncLoadDetailThread } from '@/states/detail-thread/action';
 
 export const Route = createFileRoute('/threads/$threadId')({
   component: ThreadDetailComponent,
@@ -30,9 +31,13 @@ export const Route = createFileRoute('/threads/$threadId')({
 
 function ThreadDetailComponent() {
   const { threadId } = Route.useParams();
+  useDispatchOnMount(asyncLoadDetailThread(threadId));
+
   const router = useRouter();
   const auth = useAppSelector((state) => state.auth);
-  const { data: thread, isLoading } = useThreadDetail(threadId);
+  const { data: thread, status } = useAppSelector(
+    (state) => state.detailThread
+  );
   const { mutate: createComment, isPending: isSubmitting } =
     useCreateComment(threadId);
   const { mutate: voteComment } = useVoteComment(threadId);
@@ -67,7 +72,7 @@ function ThreadDetailComponent() {
   return (
     <div className="grid h-svh grid-rows-[auto_1fr]">
       {/* Header */}
-      <div className="flex items-center gap-2 border-b bg-primary p-4 text-primary-foreground">
+      <nav className="flex h-navbar items-center gap-2 border-b bg-primary px-4 text-primary-foreground">
         <Button
           variant="ghost"
           size="icon-sm"
@@ -76,11 +81,11 @@ function ThreadDetailComponent() {
           <ChevronLeft />
         </Button>
         <span className="font-semibold">Detail Thread</span>
-      </div>
+      </nav>
 
       <ScrollArea className="min-h-0">
         <div className="mx-auto max-w-2xl space-y-6 p-4">
-          {isLoading ? (
+          {status === 'loading' ? (
             <ThreadDetailSkeleton />
           ) : thread ? (
             <>

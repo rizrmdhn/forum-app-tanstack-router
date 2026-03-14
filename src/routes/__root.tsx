@@ -18,6 +18,7 @@ import { pageHead } from '@/lib/page-head';
 import ReduxProvider from '@/components/redux-provider';
 import { useAppDispatch } from '@/hooks/use-store';
 import { asyncSetIsPreload } from '@/states/is-preload/action';
+import { useDispatchOnMount } from '@/hooks/use-dispatch-on-mount';
 
 export interface RouterAppContext {
   queryClient: QueryClient;
@@ -42,11 +43,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 });
 
 function AuthInitializer() {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(asyncSetIsPreload());
-  }, [dispatch]);
+  useDispatchOnMount(asyncSetIsPreload());
 
   return null;
 }
