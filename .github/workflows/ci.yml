@@ -84,8 +84,8 @@ jobs:
       - name: Run E2E tests
         uses: cypress-io/github-action@v6
         with:
-          start: pnpm preview
-          wait-on: http://localhost:4173
+          start: pnpm preview --port 5173
+          wait-on: http://localhost:5173
           command: pnpm cy:run:headless
           install: false
 
