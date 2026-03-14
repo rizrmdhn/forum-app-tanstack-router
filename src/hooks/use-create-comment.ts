@@ -1,40 +1,73 @@
-import { useQueryClient } from "@tanstack/react-query"
-import { useOptimisticMutation } from "@/lib/optimistic-update"
-import { useAppSelector } from "@/hooks/use-store"
-import api from "@/lib/api"
-import { threadKeys } from "@/lib/query-keys"
-import { globalErrorToast } from "@/lib/toast"
-import type { IComment, IDetailThread } from "@/types"
+import { useRef } from 'react';
+import { useOptimisticMutation } from '@/lib/optimistic-update';
+import { useAppDispatch, useAppSelector } from '@/hooks/use-store';
+import api from '@/lib/api';
+import { threadKeys } from '@/lib/query-keys';
+import { globalErrorToast, globalSuccessToast } from '@/lib/toast';
+import type { IComment, IDetailThread } from '@/types';
+import {
+  setDetailThreadActionCreator,
+  updateDetailThreadActionCreator,
+} from '@/states/detail-thread/action';
 
 export function useCreateComment(threadId: string) {
-  const queryClient = useQueryClient()
-  const auth = useAppSelector((state) => state.auth)
+  const auth = useAppSelector((state) => state.auth);
+  const { data: thread } = useAppSelector((state) => state.detailThread);
+  const dispatch = useAppDispatch();
+  const optimisticIdRef = useRef<string | null>(null);
 
   return useOptimisticMutation<IComment, Error, string, IDetailThread>(
-    { mutationFn: (content: string) => api.createComment({ threadId, content }) },
+    {
+      mutationFn: (content: string) => api.createComment({ threadId, content }),
+    },
     {
       queryOptions: { queryKey: threadKeys.detail(threadId) },
       operation: {
-        type: "update",
+        type: 'update',
         getId: () => threadId,
-        getUpdatedFields: (content) => {
-          const existing = queryClient.getQueryData<IDetailThread>(
-            threadKeys.detail(threadId)
-          )
-          const optimisticComment: IComment = {
-            id: `optimistic-${Date.now()}`,
-            content,
-            createdAt: new Date().toISOString(),
-            upVotesBy: [],
-            downVotesBy: [],
-            owner: auth!,
-          }
-          return { comments: [...(existing?.comments ?? []), optimisticComment] }
-        },
+        getUpdatedFields: () => ({}),
+      },
+      onMutate: (content) => {
+        const optimisticId = `optimistic-${Date.now()}`;
+        optimisticIdRef.current = optimisticId;
+        const optimisticComment: IComment = {
+          id: optimisticId,
+          content,
+          createdAt: new Date().toISOString(),
+          upVotesBy: [],
+          downVotesBy: [],
+          owner: auth!,
+        };
+        dispatch(
+          updateDetailThreadActionCreator({
+            comments: [...(thread?.comments ?? []), optimisticComment],
+          })
+        );
+      },
+      onSuccess: (realComment) => {
+        if (optimisticIdRef.current && thread) {
+          const updatedComments = (thread.comments ?? []).map((c) =>
+            c.id === optimisticIdRef.current ? realComment : c
+          );
+          dispatch(
+            updateDetailThreadActionCreator({ comments: updatedComments })
+          );
+          optimisticIdRef.current = null;
+        }
+        globalSuccessToast('Komentar berhasil dikirim!');
       },
       onError: (error) => {
-        globalErrorToast(`Gagal mengirim komentar: ${error.message}`)
+        if (thread) {
+          dispatch(
+            setDetailThreadActionCreator({
+              status: 'success',
+              data: thread,
+              error: null,
+            })
+          );
+        }
+        globalErrorToast(`Gagal mengirim komentar: ${error.message}`);
       },
     }
-  )
+  );
 }
