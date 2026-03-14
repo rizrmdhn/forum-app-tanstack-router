@@ -1,11 +1,11 @@
-type ThunkFn<D, S> = (dispatch: D, getState: () => S) => Promise<void>;
+type ThunkFn<D, S = unknown> = (dispatch: D, getState: () => S) => Promise<void>;
 
-interface AsyncHandlerOptions<D, S> {
+interface AsyncHandlerOptions<D, S = unknown> {
   onError?: (dispatch: D, error: unknown, getState: () => S) => void;
   onFinally?: (dispatch: D) => void;
 }
 
-export function asyncHandler<D, S>(
+export function asyncHandler<D, S = unknown>(
   fn: ThunkFn<D, S>,
   options: AsyncHandlerOptions<D, S> = {}
 ): ThunkFn<D, S> {

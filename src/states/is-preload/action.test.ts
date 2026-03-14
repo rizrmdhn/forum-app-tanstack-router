@@ -12,6 +12,7 @@ vi.mock('@/lib/api', () => ({
 
 describe('asyncSetIsPreload', () => {
   const dispatch = vi.fn();
+  const getState = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -26,7 +27,7 @@ describe('asyncSetIsPreload', () => {
     vi.mocked(api.getOwnProfile).mockResolvedValue(user);
 
     const thunk = asyncSetIsPreload();
-    await thunk(dispatch as never);
+    await thunk(dispatch as never, getState as never);
 
     expect(dispatch).toHaveBeenCalledWith(receiveAuthUserActionCreator(user));
     expect(dispatch).toHaveBeenLastCalledWith(setIsPreloadActionCreator(false));
@@ -40,7 +41,7 @@ describe('asyncSetIsPreload', () => {
     vi.mocked(api.getOwnProfile).mockRejectedValue(new Error('Unauthorized'));
 
     const thunk = asyncSetIsPreload();
-    await thunk(dispatch as never);
+    await thunk(dispatch as never, getState as never);
 
     expect(dispatch).toHaveBeenCalledWith(setIsPreloadActionCreator(null));
     expect(dispatch).toHaveBeenLastCalledWith(setIsPreloadActionCreator(false));
