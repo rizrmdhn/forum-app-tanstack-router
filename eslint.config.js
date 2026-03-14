@@ -91,9 +91,12 @@ export default defineConfig([
         devDependencies: [
           '**/*.test.{ts,tsx}',
           '**/*.spec.{ts,tsx}',
+          'src/test/**',
           'vite.config.ts',
           'src/main.tsx',
           'src/routes/__root.tsx',
+          'cypress/**',
+          'cypress.config.ts',
         ],
       }],
 
