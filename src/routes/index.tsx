@@ -18,6 +18,11 @@ import { useDispatchOnMount } from '@/hooks/use-dispatch-on-mount';
 import { asyncLoadThreadsAndUsers } from '@/states/shared/action';
 import { useAppSelector } from '../hooks/use-store';
 
+const SKELETON_KEYS = Array.from(
+  { length: 6 },
+  (_, i) => `thread-skeleton-${i}`
+);
+
 export const Route = createFileRoute('/')({
   validateSearch: z.object({
     search: z.string().optional(),
@@ -56,7 +61,7 @@ function HomeComponent() {
       <ScrollArea className="min-h-0">
         <div className="mx-auto max-w-2xl space-y-4 p-4">
           {isLoading
-            ? Array.from({ length: 6 }).map(() => <ThreadCardSkeleton />)
+            ? SKELETON_KEYS.map((key) => <ThreadCardSkeleton key={key} />)
             : filteredThreads?.map((thread) => {
                 const owner = users?.find((u) => u.id === thread.ownerId);
                 return (
