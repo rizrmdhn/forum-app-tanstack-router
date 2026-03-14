@@ -14,12 +14,23 @@ export default function threadReducer(
   switch (action.type) {
     case 'SET_THREADS':
       return action.payload;
+    case 'ADD_THREAD':
+      if (state.status !== 'success' || !state.data) return state;
+      return { ...state, data: [action.payload, ...state.data] };
     case 'UPDATE_THREAD':
       if (state.status !== 'success' || !state.data) return state;
       return {
         ...state,
         data: state.data.map((t) =>
           t.id === action.payload.id ? { ...t, ...action.payload } : t
+        ),
+      };
+    case 'REPLACE_THREAD':
+      if (state.status !== 'success' || !state.data) return state;
+      return {
+        ...state,
+        data: state.data.map((t) =>
+          t.id === action.payload.oldId ? action.payload.thread : t
         ),
       };
     default:
