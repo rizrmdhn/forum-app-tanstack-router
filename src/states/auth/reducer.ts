@@ -4,7 +4,6 @@ import type { AuthUserAction } from './action';
 export type AuthState = IUser | null;
 
 const initialState: AuthState = null;
-const _ciTest: string = asdasd; // intentional error to test CI
 
 function authReducer(
   state: AuthState = initialState,
