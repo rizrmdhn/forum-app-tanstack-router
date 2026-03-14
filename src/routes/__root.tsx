@@ -1,26 +1,26 @@
-import { useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/sonner"
-import type { QueryClient } from "@tanstack/react-query"
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { ThemeProvider } from '@/components/theme-provider';
+import { Toaster } from '@/components/ui/sonner';
+import type { QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   HeadContent,
   Outlet,
   createRootRouteWithContext,
   useRouter,
-} from "@tanstack/react-router"
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools"
-import { AlertTriangle, FileQuestion } from "lucide-react"
-import { z } from "zod"
-import "../index.css"
-import { pageHead } from "@/lib/page-head"
-import ReduxProvider from "@/components/redux-provider"
-import { useAppDispatch } from "@/hooks/use-store"
-import { asyncSetIsPreload } from "@/states/is-preload/action"
+} from '@tanstack/react-router';
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { AlertTriangle, FileQuestion } from 'lucide-react';
+import { z } from 'zod';
+import '../index.css';
+import { pageHead } from '@/lib/page-head';
+import ReduxProvider from '@/components/redux-provider';
+import { useAppDispatch } from '@/hooks/use-store';
+import { asyncSetIsPreload } from '@/states/is-preload/action';
 
 export interface RouterAppContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
@@ -29,26 +29,26 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   errorComponent: ErrorComponent,
   head: () => ({
     ...pageHead(
-      "Forums App",
-      "A simple forum app built with React, TanStack Router, and Tailwind CSS"
+      'Forums App',
+      'A simple forum app built with React, TanStack Router, and Tailwind CSS'
     ),
     links: [
       {
-        rel: "icon",
-        href: "/favicon.ico",
+        rel: 'icon',
+        href: '/favicon.ico',
       },
     ],
   }),
-})
+});
 
 function AuthInitializer() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(asyncSetIsPreload())
-  }, [dispatch])
+    dispatch(asyncSetIsPreload());
+  }, [dispatch]);
 
-  return null
+  return null;
 }
 
 function RootComponent() {
@@ -72,11 +72,11 @@ function RootComponent() {
       <TanStackRouterDevtools position="bottom-left" />
       <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
     </>
-  )
+  );
 }
 
 function NotFoundComponent() {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -100,83 +100,81 @@ function NotFoundComponent() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function ErrorComponent({ error }: { error: Error }) {
-  const router = useRouter()
+  const router = useRouter();
 
   // Format error message based on error type
   const getErrorMessage = () => {
     // Helper function to render prettified errors in human-readable format
     const renderPrettifiedErrors = (errorString: string): React.ReactNode => {
       // Split the prettified error string by newlines
-      const lines = errorString.split("\n").filter((line) => line.trim())
+      const lines = errorString.split('\n').filter((line) => line.trim());
 
       // Combine error message with its path (pattern: "✖ message" followed by "→ at path")
-      const errors: string[] = []
+      const errors: string[] = [];
       for (let i = 0; i < lines.length; i++) {
-        const line = lines[i]?.trim()
-        if (line?.startsWith("✖")) {
-          const message = line.replace("✖ ", "")
-          const nextLine = lines[i + 1]?.trim()
-          if (nextLine?.startsWith("→ at")) {
-            const path = nextLine.replace("→ at ", "")
-            errors.push(`${path}: ${message}`)
-            i += 1 // Skip the next line since we've already processed it
+        const line = lines[i]?.trim();
+        if (line?.startsWith('✖')) {
+          const message = line.replace('✖ ', '');
+          const nextLine = lines[i + 1]?.trim();
+          if (nextLine?.startsWith('→ at')) {
+            const path = nextLine.replace('→ at ', '');
+            errors.push(`${path}: ${message}`);
+            i += 1; // Skip the next line since we've already processed it
           } else {
-            errors.push(message)
+            errors.push(message);
           }
         }
       }
 
       return (
         <div className="space-y-2">
-          {errors.map((errorMsg, idx) => (
-            <p key={idx} className="text-sm text-destructive">
-              {errorMsg}
-            </p>
+          {errors.map((errorMsg) => (
+            <p className="text-sm text-destructive">{errorMsg}</p>
           ))}
         </div>
-      )
-    }
+      );
+    };
 
     // Check if it's a ZodError directly
     if (error instanceof z.ZodError) {
-      const prettified = z.prettifyError(error)
+      const prettified = z.prettifyError(error);
       return (
         <div className="max-w-2xl text-left">
           <p className="mb-3 text-center font-semibold">Validasi data gagal:</p>
           {renderPrettifiedErrors(prettified)}
         </div>
-      )
+      );
     }
 
     // Check if it's a TanStack Router error with Zod validation in cause
     if (
-      "cause" in error &&
+      'cause' in error &&
       error.cause &&
-      typeof error.cause === "object" &&
-      "issues" in error.cause &&
+      typeof error.cause === 'object' &&
+      'issues' in error.cause &&
       Array.isArray(error.cause.issues)
     ) {
       // Convert cause.issues to ZodError format and use prettifyError
-      const zodError = new z.ZodError(error.cause.issues as z.core.$ZodIssue[])
-      const prettified = z.prettifyError(zodError)
+      const zodError = new z.ZodError(error.cause.issues as z.core.$ZodIssue[]);
+      const prettified = z.prettifyError(zodError);
       return (
         <div className="max-w-2xl text-left">
           <p className="mb-3 text-center font-semibold">Validasi data gagal:</p>
           {renderPrettifiedErrors(prettified)}
         </div>
-      )
+      );
     }
 
     return (
       <p className="max-w-md text-muted-foreground">
-        {error.message || "Maaf, terjadi kesalahan. Silakan coba lagi nanti."}
+        {error.message || 'Maaf, terjadi kesalahan. Silakan coba lagi nanti.'}
       </p>
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -197,5 +195,5 @@ function ErrorComponent({ error }: { error: Error }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

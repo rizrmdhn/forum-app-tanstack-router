@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from './ui/card';
 import { Skeleton } from './ui/skeleton';
+import { SafeHTML } from './safe-html';
 
 interface ThreadCardProps {
   thread: IThread;
@@ -122,9 +123,9 @@ export function ThreadCard({
       </CardHeader>
 
       <CardContent>
-        <p
+        <SafeHTML
           className="line-clamp-3 text-sm text-muted-foreground"
-          dangerouslySetInnerHTML={{ __html: thread.body }}
+          html={thread.body}
         />
       </CardContent>
 
