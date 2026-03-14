@@ -5,6 +5,7 @@ import { asyncHandler } from '@/lib/async-handler';
 
 const ActionType = {
   SET_DETAIL_THREAD: 'SET_DETAIL_THREAD',
+  UPDATE_DETAIL_THREAD: 'UPDATE_DETAIL_THREAD',
 } as const;
 
 export type ActionType = (typeof ActionType)[keyof typeof ActionType];
@@ -14,12 +15,23 @@ type SetDetailThreadAction = ActionInterface<
   StateInterface<IDetailThread>
 >;
 
-export type DetailThreadAction = SetDetailThreadAction;
+type UpdateDetailThreadAction = ActionInterface<
+  typeof ActionType.UPDATE_DETAIL_THREAD,
+  Partial<IDetailThread>
+>;
+
+export type DetailThreadAction = SetDetailThreadAction | UpdateDetailThreadAction;
 
 export function setDetailThreadActionCreator(
   state: StateInterface<IDetailThread>
 ): SetDetailThreadAction {
   return { type: ActionType.SET_DETAIL_THREAD, payload: state };
+}
+
+export function updateDetailThreadActionCreator(
+  fields: Partial<IDetailThread>
+): UpdateDetailThreadAction {
+  return { type: ActionType.UPDATE_DETAIL_THREAD, payload: fields };
 }
 
 export function asyncLoadDetailThread(threadId: string) {
