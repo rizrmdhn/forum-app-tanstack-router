@@ -14,9 +14,14 @@ vi.mock('@/lib/api', () => ({
 
 describe('asyncLoadThreadsAndUsers', () => {
   const dispatch = vi.fn();
+  const getState = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    getState.mockReturnValue({
+      thread: { status: 'loading', data: null, error: null },
+      user: { status: 'loading', data: null, error: null },
+    });
   });
 
   /**
@@ -30,7 +35,7 @@ describe('asyncLoadThreadsAndUsers', () => {
     vi.mocked(api.getAllUsers).mockResolvedValue(users);
 
     const thunk = asyncLoadThreadsAndUsers();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenCalledWith(
       setThreadsActionCreator({ status: 'loading', data: null, error: null })
@@ -58,7 +63,7 @@ describe('asyncLoadThreadsAndUsers', () => {
     vi.mocked(api.getAllUsers).mockResolvedValue(users);
 
     const thunk = asyncLoadThreadsAndUsers();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenCalledWith(
       setThreadsActionCreator({
@@ -81,7 +86,7 @@ describe('asyncLoadThreadsAndUsers', () => {
     vi.mocked(api.getAllUsers).mockRejectedValue(new Error('Users error'));
 
     const thunk = asyncLoadThreadsAndUsers();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenCalledWith(
       setThreadsActionCreator({
@@ -94,6 +99,45 @@ describe('asyncLoadThreadsAndUsers', () => {
       setUsersActionCreator({
         status: 'error',
         data: null,
+        error: 'Users error',
+      })
+    );
+  });
+
+  /**
+   * Skenario: data sudah ada di store dan kedua API gagal.
+   * Harapan: data yang sudah ada tetap dipertahankan pada state loading dan error.
+   */
+  it('should preserve existing data in loading and error state when data already exists', async () => {
+    const existingThreads = [makeThread()];
+    const existingUsers = [makeUser()];
+    getState.mockReturnValue({
+      thread: { status: 'success', data: existingThreads, error: null },
+      user: { status: 'success', data: existingUsers, error: null },
+    });
+    vi.mocked(api.getAllThreads).mockRejectedValue(new Error('Threads error'));
+    vi.mocked(api.getAllUsers).mockRejectedValue(new Error('Users error'));
+
+    const thunk = asyncLoadThreadsAndUsers();
+    await thunk(dispatch, getState);
+
+    expect(dispatch).toHaveBeenCalledWith(
+      setThreadsActionCreator({ status: 'loading', data: existingThreads, error: null })
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setUsersActionCreator({ status: 'loading', data: existingUsers, error: null })
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setThreadsActionCreator({
+        status: 'error',
+        data: existingThreads,
+        error: 'Threads error',
+      })
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setUsersActionCreator({
+        status: 'error',
+        data: existingUsers,
         error: 'Users error',
       })
     );

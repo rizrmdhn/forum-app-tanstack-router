@@ -11,9 +11,11 @@ vi.mock('@/lib/api', () => ({
 
 describe('asyncLoadThreads', () => {
   const dispatch = vi.fn();
+  const getState = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    getState.mockReturnValue({ thread: { status: 'loading', data: null, error: null } });
   });
 
   /**
@@ -25,7 +27,7 @@ describe('asyncLoadThreads', () => {
     vi.mocked(api.getAllThreads).mockResolvedValue(threads);
 
     const thunk = asyncLoadThreads();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -45,7 +47,7 @@ describe('asyncLoadThreads', () => {
     vi.mocked(api.getAllThreads).mockRejectedValue(new Error('Failed to load'));
 
     const thunk = asyncLoadThreads();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -69,10 +71,38 @@ describe('asyncLoadThreads', () => {
     vi.mocked(api.getAllThreads).mockResolvedValue([]);
 
     const thunk = asyncLoadThreads();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenLastCalledWith(
       setThreadsActionCreator({ status: 'success', data: [], error: null })
+    );
+  });
+
+  /**
+   * Skenario: data thread sudah ada di store dan API gagal.
+   * Harapan: data yang sudah ada tetap dipertahankan pada state loading dan error.
+   */
+  it('should preserve existing threads in loading and error state when data already exists', async () => {
+    const existingThreads = [makeThread()];
+    getState.mockReturnValue({
+      thread: { status: 'success', data: existingThreads, error: null },
+    });
+    vi.mocked(api.getAllThreads).mockRejectedValue(new Error('Network error'));
+
+    const thunk = asyncLoadThreads();
+    await thunk(dispatch, getState);
+
+    expect(dispatch).toHaveBeenNthCalledWith(
+      1,
+      setThreadsActionCreator({ status: 'loading', data: existingThreads, error: null })
+    );
+    expect(dispatch).toHaveBeenNthCalledWith(
+      2,
+      setThreadsActionCreator({
+        status: 'error',
+        data: existingThreads,
+        error: 'Network error',
+      })
     );
   });
 });

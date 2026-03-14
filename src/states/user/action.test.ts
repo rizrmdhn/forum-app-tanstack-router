@@ -11,9 +11,11 @@ vi.mock('@/lib/api', () => ({
 
 describe('asyncLoadUsers', () => {
   const dispatch = vi.fn();
+  const getState = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    getState.mockReturnValue({ user: { status: 'loading', data: null, error: null } });
   });
 
   /**
@@ -25,7 +27,7 @@ describe('asyncLoadUsers', () => {
     vi.mocked(api.getAllUsers).mockResolvedValue(users);
 
     const thunk = asyncLoadUsers();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -45,7 +47,7 @@ describe('asyncLoadUsers', () => {
     vi.mocked(api.getAllUsers).mockRejectedValue(new Error('Unauthorized'));
 
     const thunk = asyncLoadUsers();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -57,6 +59,34 @@ describe('asyncLoadUsers', () => {
         status: 'error',
         data: null,
         error: 'Unauthorized',
+      })
+    );
+  });
+
+  /**
+   * Skenario: data user sudah ada di store dan API gagal.
+   * Harapan: data yang sudah ada tetap dipertahankan pada state loading dan error.
+   */
+  it('should preserve existing users in loading and error state when data already exists', async () => {
+    const existingUsers = [makeUser()];
+    getState.mockReturnValue({
+      user: { status: 'success', data: existingUsers, error: null },
+    });
+    vi.mocked(api.getAllUsers).mockRejectedValue(new Error('Service unavailable'));
+
+    const thunk = asyncLoadUsers();
+    await thunk(dispatch, getState);
+
+    expect(dispatch).toHaveBeenNthCalledWith(
+      1,
+      setUsersActionCreator({ status: 'loading', data: existingUsers, error: null })
+    );
+    expect(dispatch).toHaveBeenNthCalledWith(
+      2,
+      setUsersActionCreator({
+        status: 'error',
+        data: existingUsers,
+        error: 'Service unavailable',
       })
     );
   });

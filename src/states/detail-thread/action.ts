@@ -57,11 +57,11 @@ export function asyncLoadDetailThread(threadId: string) {
       );
     },
     {
-      onError: (dispatch, error) =>
+      onError: (dispatch, error, getState) =>
         dispatch(
           setDetailThreadActionCreator({
             status: 'error',
-            data: null,
+            data: getState().detailThread.data,
             error: (error as Error).message,
           })
         ),

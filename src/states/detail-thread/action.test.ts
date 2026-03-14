@@ -12,9 +12,11 @@ vi.mock('@/lib/api', () => ({
 
 describe('asyncLoadDetailThread', () => {
   const dispatch = vi.fn();
+  const getState = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    getState.mockReturnValue({ detailThread: { status: 'loading', data: null, error: null } });
   });
 
   /**
@@ -27,7 +29,7 @@ describe('asyncLoadDetailThread', () => {
     vi.mocked(api.getThreadById).mockResolvedValue(thread);
 
     const thunk = asyncLoadDetailThread(threadId);
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -58,7 +60,7 @@ describe('asyncLoadDetailThread', () => {
     );
 
     const thunk = asyncLoadDetailThread(threadId);
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,

@@ -39,14 +39,16 @@ export function asyncLoadUsers() {
       );
     },
     {
-      onError: (dispatch, error) =>
+      onError: (dispatch, error, getState) => {
+        const existing = getState() as { user: StateInterface<IUser[]> };
         dispatch(
           setUsersActionCreator({
             status: 'error',
-            data: null,
+            data: existing.user.data,
             error: (error as Error).message,
           })
-        ),
+        );
+      },
     }
   );
 }

@@ -19,9 +19,11 @@ vi.mock('@/lib/api', () => ({
 
 describe('asyncLoadLeaderboard', () => {
   const dispatch = vi.fn();
+  const getState = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
+    getState.mockReturnValue({ leaderboard: { status: 'loading', data: null, error: null } });
   });
 
   /**
@@ -33,7 +35,7 @@ describe('asyncLoadLeaderboard', () => {
     vi.mocked(api.getLeaderboards).mockResolvedValue(leaderboards);
 
     const thunk = asyncLoadLeaderboard();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -61,7 +63,7 @@ describe('asyncLoadLeaderboard', () => {
     vi.mocked(api.getLeaderboards).mockRejectedValue(new Error('Server error'));
 
     const thunk = asyncLoadLeaderboard();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenNthCalledWith(
       1,
@@ -89,7 +91,7 @@ describe('asyncLoadLeaderboard', () => {
     vi.mocked(api.getLeaderboards).mockResolvedValue([]);
 
     const thunk = asyncLoadLeaderboard();
-    await thunk(dispatch as never);
+    await thunk(dispatch, getState);
 
     expect(dispatch).toHaveBeenLastCalledWith(
       setLeaderboardActionCreator({ status: 'success', data: [], error: null })

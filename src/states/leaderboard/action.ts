@@ -43,11 +43,11 @@ export function asyncLoadLeaderboard() {
       );
     },
     {
-      onError: (dispatch, error) =>
+      onError: (dispatch, error, getState) =>
         dispatch(
           setLeaderboardActionCreator({
             status: 'error',
-            data: null,
+            data: getState().leaderboard.data,
             error: (error as Error).message,
           })
         ),
