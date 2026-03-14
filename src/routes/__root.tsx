@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -16,7 +15,6 @@ import { z } from 'zod';
 import '../index.css';
 import { pageHead } from '@/lib/page-head';
 import ReduxProvider from '@/components/redux-provider';
-import { useAppDispatch } from '@/hooks/use-store';
 import { asyncSetIsPreload } from '@/states/is-preload/action';
 import { useDispatchOnMount } from '@/hooks/use-dispatch-on-mount';
 
